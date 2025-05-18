@@ -1,0 +1,105 @@
+import React, { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { motion } from "framer-motion";
+import { FileText } from "lucide-react";
+
+const validUsers = {
+  GCC: "science",
+};
+
+export default function StudyGroupSite() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [error, setError] = useState("");
+  const [pdfList, setPdfList] = useState([
+    { title: "Data Structures Notes", url: "/pdfs/data-structures.pdf" },
+    { title: "Computer Networks", url: "/pdfs/computer-networks.pdf" },
+    { title: "Operating Systems", url: "/pdfs/operating-systems.pdf" },
+    { title: "Database Systems", url: "/pdfs/database-systems.pdf" },
+  ]);
+  const [uploadTitle, setUploadTitle] = useState("");
+  const [uploadFile, setUploadFile] = useState(null);
+
+  const handleLogin = () => {
+    if (validUsers[username] === password) {
+      setIsLoggedIn(true);
+      setError("");
+    } else {
+      setError("Invalid username or password");
+    }
+  };
+
+  const handleUpload = () => {
+    if (!uploadTitle || !uploadFile) return;
+    const fileURL = URL.createObjectURL(uploadFile);
+    setPdfList([...pdfList, { title: uploadTitle, url: fileURL }]);
+    setUploadTitle("");
+    setUploadFile(null);
+  };
+
+  if (!isLoggedIn) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
+        <motion.div
+          className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-sm"
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <h2 className="text-2xl font-bold mb-4 text-center">ICT Study Group Login</h2>
+          <Input
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            className="mb-4"
+          />
+          <Input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="mb-4"
+          />
+          {error && <p className="text-red-500 mb-4 text-sm text-center">{error}</p>}
+          <Button onClick={handleLogin} className="w-full">
+            Login
+          </Button>
+        </motion.div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-100 p-8">
+      <motion.h1
+        className="text-4xl font-bold text-center mb-8"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+      >
+        📘 ICT Study Group Resources
+      </motion.h1>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+        {pdfList.map((pdf, idx) => (
+          <motion.a
+            href={pdf.url}
+            target="_blank"
+            key={idx}
+            className="no-underline"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Card className="p-4 cursor-pointer hover:shadow-2xl transition-shadow duration-300">
+              <CardContent className="flex flex-col items-center">
+                <FileText className="w-12 h-12 text-blue-600 mb-2" />
+                <p className="text-lg font-semibold text-center">{pdf.title}</p>
+              </CardContent>
+            </Card>
+          </motion.a>
+        ))}
+      </div>
+
+      <div className="max-w-xl mx-auto bg-white p-6 rounded-2xl shadow-md">
+        <h2 className="text-xl font-semibold
